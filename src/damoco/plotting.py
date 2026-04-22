@@ -14,7 +14,22 @@ from ._utils import PI2
 
 
 def co_plotcoef(F, pltype, fignum=None, own_lab=None, ext_lab=None, tit=None):
-    r"""Plot :math:`|F_{n,m}|` or :math:`|Q_{n,m}|` for one oscillator model."""
+    r"""Plot :math:`|F_{n,m}|` or :math:`|Q_{n,m}|` for one oscillator model.
+
+    Parameters
+    ----------
+    F : array_like
+        Fourier coefficient matrix.
+    pltype : int
+        Plot mode: 0 custom labels, 1 phase defaults, >1 protophase defaults.
+    fignum : int | None, optional
+        Matplotlib figure number.
+
+    Returns
+    -------
+    tuple
+        ``(figure, axes)`` handle tuple.
+    """
     FF = np.asarray(F, dtype=complex).copy()
     or_ = (max(FF.shape) - 1) // 2
     n = np.arange(-or_, or_ + 1)
@@ -46,7 +61,20 @@ def co_plotcoef(F, pltype, fignum=None, own_lab=None, ext_lab=None, tit=None):
 
 
 def co_plotcplf(f, pltype, fignum=None, own_lab=None, ext_lab=None, zlab=None, tit=None):
-    r"""Plot one function :math:`q(\phi_{own},\phi_{ext})` (or protophase analog)."""
+    r"""Plot one function :math:`q(\phi_{own},\phi_{ext})` (or protophase analog).
+
+    Parameters
+    ----------
+    f : array_like
+        2D coupling/protophase function sampled on a periodic grid.
+    pltype : int
+        Plot mode: 0 custom labels, 1 phase defaults, >1 protophase defaults.
+
+    Returns
+    -------
+    tuple
+        ``(figure, axes3d)`` handle tuple.
+    """
     ff = np.asarray(f, dtype=float)
     ngrid = max(ff.shape)
     arg = PI2 * np.arange(ngrid) / (ngrid - 1)
@@ -87,7 +115,20 @@ def co_plot2coef(
     ext_lab_2=None,
     tit_2=None,
 ):
-    r"""Plot two coefficient matrices side by side with shared color scale."""
+    r"""Plot two coefficient matrices side by side with shared color scale.
+
+    Parameters
+    ----------
+    F1, F2 : array_like
+        Fourier coefficient matrices.
+    pltype : int
+        Plot mode: 0 custom labels, 1 phase defaults, >1 protophase defaults.
+
+    Returns
+    -------
+    tuple
+        ``(figure, (ax_left, ax_right))`` handle tuple.
+    """
     A = np.asarray(F1, dtype=complex).copy()
     B = np.asarray(F2, dtype=complex).copy()
     or_ = (max(A.shape) - 1) // 2
@@ -147,7 +188,20 @@ def co_plot2coef(
 
 
 def co_plot2cplf(f1, f2, pltype, fignum=None, xl=None, yl=None, zl1=None, zl2=None, tit=None):
-    r"""Plot two coupling/protophase surfaces for comparative inspection."""
+    r"""Plot two coupling/protophase surfaces for comparative inspection.
+
+    Parameters
+    ----------
+    f1, f2 : array_like
+        2D coupling/protophase functions on periodic grids.
+    pltype : int
+        Plot mode: 0 custom labels, 1 phase defaults, >1 protophase defaults.
+
+    Returns
+    -------
+    tuple
+        ``(figure, (ax_left, ax_right))`` handle tuple.
+    """
     a = np.asarray(f1, dtype=float)
     b = np.asarray(f2, dtype=float)
     ngrid = max(a.shape)
@@ -189,6 +243,11 @@ def co_plottri(fignum, cpar, thresh=0.07):
 
     Entries ``cpar(i,j)`` represent effect of node ``j`` on node ``i``.
     Edges weaker than ``thresh * max(cpar)`` are omitted.
+
+    Returns
+    -------
+    tuple
+        ``(figure, axes)`` handle tuple.
     """
     c = np.asarray(cpar, dtype=float).T
     cm = np.max(c)

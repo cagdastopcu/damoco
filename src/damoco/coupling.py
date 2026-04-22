@@ -21,6 +21,22 @@ def co_fcplfct1(phi1, phi2, dphi1, N, ngrid=100):
     Fits coefficients in
     :math:`q(\phi_1,\phi_2)=\sum_{n,m=-N}^{N} Q_{n,m}e^{i(n\phi_1+m\phi_2)}`
     by solving the DAMOCO normal equations in complex form.
+
+    Parameters
+    ----------
+    phi1, phi2 : array_like
+        Phase/protophase trajectories.
+    dphi1 : array_like
+        Time derivative of ``phi1``.
+    N : int
+        Fourier order.
+    ngrid : int, optional
+        Grid size for reconstructed coupling function.
+
+    Returns
+    -------
+    tuple
+        ``(Qcoef, q_grid)``.
     """
     p1 = np.unwrap(_as_1d(phi1))
     p2 = np.unwrap(_as_1d(phi2))
@@ -71,6 +87,22 @@ def co_fcplfct2(phi1, phi2, dphi1, dphi2, N, ngrid=100):
 
     Solves for two right-hand sides simultaneously (from :math:`\dot\phi_1`,
     :math:`\dot\phi_2`) using the same regression matrix, matching MATLAB logic.
+
+    Parameters
+    ----------
+    phi1, phi2 : array_like
+        Phase/protophase trajectories.
+    dphi1, dphi2 : array_like
+        Phase derivatives.
+    N : int
+        Fourier order.
+    ngrid : int, optional
+        Grid size for reconstructed functions.
+
+    Returns
+    -------
+    tuple
+        ``(Qcoef1, Qcoef2, q1_grid, q2_grid)``.
     """
     p1 = np.unwrap(_as_1d(phi1))
     p2 = np.unwrap(_as_1d(phi2))
@@ -131,6 +163,20 @@ def co_fcpltri(phi1, phi2, phi3, Dphi1, Dphi2, Dphi3, N):
     Uses expansion
     :math:`\sum_{n,m,k=-N}^{N}Q_{n,m,k}e^{i(n\phi_1+m\phi_2+k\phi_3)}`
     for each oscillator's phase dynamics with DAMOCO index conventions.
+
+    Parameters
+    ----------
+    phi1, phi2, phi3 : array_like
+        Phase/protophase trajectories.
+    Dphi1, Dphi2, Dphi3 : array_like
+        Corresponding phase derivatives.
+    N : int
+        Fourier order.
+
+    Returns
+    -------
+    tuple
+        ``(Qcoef1, Qcoef2, Qcoef3)`` with shape ``(2N+1, 2N+1, 2N+1)`` each.
     """
     p1 = np.unwrap(_as_1d(phi1))
     p2 = np.unwrap(_as_1d(phi2))
@@ -232,6 +278,20 @@ def co_tricplfan(Qcoef1, Qcoef2, Qcoef3, meth=1, thresh=2):
     1/2 -> partial norms (absolute / normalized by :math:`\omega`),
     3/4 -> partial derivatives (absolute / normalized by :math:`\omega`).
     Returns coupling matrix, total norms, and autonomous frequencies.
+
+    Parameters
+    ----------
+    Qcoef1, Qcoef2, Qcoef3 : array_like
+        Triadic Fourier coefficient tensors from ``co_fcpltri``.
+    meth : int, optional
+        Coupling summary method (1..4).
+    thresh : float, optional
+        Threshold (% of max coefficient magnitude) for coefficient pruning.
+
+    Returns
+    -------
+    tuple
+        ``(COUP, NORM, OMEGA)``.
     """
     Q1 = np.asarray(Qcoef1, dtype=complex).copy()
     Q2 = np.asarray(Qcoef2, dtype=complex).copy()
@@ -277,6 +337,24 @@ def co_nettri(PHI, PHI_dot, N, meth=1, thresh=2):
 
     For each oscillator triplet, fits triadic Fourier models and aggregates pair
     effects by the minimum over all triplets containing each ordered pair.
+
+    Parameters
+    ----------
+    PHI : array_like
+        Matrix of phases with shape ``(nodes, time)`` (or transposed form).
+    PHI_dot : array_like
+        Matrix of phase derivatives matching ``PHI``.
+    N : int
+        Fourier order for triplet fitting.
+    meth : int, optional
+        Coupling summary method passed to ``co_tricplfan``.
+    thresh : float, optional
+        Threshold parameter passed to ``co_tricplfan``.
+
+    Returns
+    -------
+    numpy.ndarray
+        Directed coupling matrix ``COUP`` with shape ``(nodes, nodes)``.
     """
     phi = np.asarray(PHI, dtype=float)
     phidot = np.asarray(PHI_dot, dtype=float)
@@ -351,6 +429,24 @@ def co_kcplfct1(phi1, phi2, phi1_dot, ngrid, fignum=0, al_x=None, al_y=None):
     Computes weighted conditional mean
     :math:`q_1(\phi_1,\phi_2)=\frac{\sum_t \dot\phi_1(t)K_xK_y}{\sum_t K_xK_y}`
     on a periodic grid.
+
+    Parameters
+    ----------
+    phi1, phi2 : array_like
+        Phase trajectories.
+    phi1_dot : array_like
+        Derivative of ``phi1``.
+    ngrid : int
+        Grid size.
+    fignum : int, optional
+        If positive, draw 3D surface.
+    al_x, al_y : float | None, optional
+        Kernel smoothness parameters. If ``None``, DAMOCO defaults are used.
+
+    Returns
+    -------
+    numpy.ndarray
+        Estimated coupling function grid.
     """
     ng1 = ngrid - 1
     if al_x is None:
@@ -389,6 +485,22 @@ def co_kcplfct2(phi1, phi2, phi1_dot, phi2_dot, ngrid, al_x=None, al_y=None):
     Same kernel denominator is reused for two numerators from
     :math:`\dot\phi_1` and :math:`\dot\phi_2`; output orientation matches
     DAMOCO conventions.
+
+    Parameters
+    ----------
+    phi1, phi2 : array_like
+        Phase trajectories.
+    phi1_dot, phi2_dot : array_like
+        Phase derivatives.
+    ngrid : int
+        Grid size.
+    al_x, al_y : float | None, optional
+        Kernel smoothness parameters. If ``None``, DAMOCO defaults are used.
+
+    Returns
+    -------
+    tuple
+        ``(q1, q2)`` coupling function grids.
     """
     ng1 = ngrid - 1
     if al_x is None:

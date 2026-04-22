@@ -33,6 +33,18 @@ def co_phidot1(phi, fsample):
 
     Computes :math:`\dot\phi(t)` by Savitzky-Golay local polynomial derivative
     (order 4, window length 9), matching MATLAB defaults.
+
+    Parameters
+    ----------
+    phi : array_like
+        Phase/protophase time series.
+    fsample : float
+        Sampling frequency (Hz or reciprocal of time step).
+
+    Returns
+    -------
+    tuple
+        ``(phi_dot, phi_truncated)`` aligned after boundary trimming.
     """
     p = _as_1d(phi)
     d, p_cut = _sg_diff(p, fsample)
@@ -44,6 +56,18 @@ def co_phidot2(phi1, phi2, fsample):
 
     Applies the same Savitzky-Golay differentiator to each input phase and
     returns truncated aligned outputs (boundary points removed).
+
+    Parameters
+    ----------
+    phi1, phi2 : array_like
+        Phase/protophase time series.
+    fsample : float
+        Sampling frequency.
+
+    Returns
+    -------
+    tuple
+        ``(phi1_dot, phi2_dot, phi1_truncated, phi2_truncated)``.
     """
     p1 = _as_1d(phi1)
     p2 = _as_1d(phi2)
@@ -57,6 +81,18 @@ def co_phidot3(phi1, phi2, phi3, fsample):
 
     Uses identical differentiator and truncation for all channels to preserve
     temporal alignment of :math:`\dot\phi_1,\dot\phi_2,\dot\phi_3`.
+
+    Parameters
+    ----------
+    phi1, phi2, phi3 : array_like
+        Phase/protophase time series.
+    fsample : float
+        Sampling frequency.
+
+    Returns
+    -------
+    tuple
+        ``(phi1_dot, phi2_dot, phi3_dot, phi1_t, phi2_t, phi3_t)``.
     """
     p1 = _as_1d(phi1)
     p2 = _as_1d(phi2)
@@ -91,6 +127,20 @@ def co_resid_decomp(dPhi1, Phi1, Phi2, q):
     Reconstructs :math:`\dot\phi_1^{\text{synth}}=q(\phi_1,\phi_2)` by bilinear
     interpolation on the periodic grid and returns residual
     :math:`r=\dot\phi_1-\dot\phi_1^{\text{synth}}` with standard deviations.
+
+    Parameters
+    ----------
+    dPhi1 : array_like
+        Measured derivative of first phase.
+    Phi1, Phi2 : array_like
+        Phase trajectories used to evaluate model.
+    q : array_like
+        Coupling/model grid for oscillator 1 dynamics.
+
+    Returns
+    -------
+    tuple
+        ``(Std_dPhi1, Std_dPhi1_synth, Std_Resid, dPhi1_synth, Resid)``.
     """
     dphi1 = _as_1d(dPhi1)
     phi1 = _as_1d(Phi1)
@@ -123,6 +173,20 @@ def co_prciter(Q, ngrid, fignum=0):
     Scans candidate :math:`\omega`, minimizes residual standard deviation, then
     returns optimal :math:`Z`, :math:`H`, :math:`\omega_{\mathrm{opt}}`, and the
     minimal decomposition error.
+
+    Parameters
+    ----------
+    Q : array_like
+        Coupling function sampled on ``ngrid x ngrid`` grid.
+    ngrid : int
+        Grid size in each phase dimension.
+    fignum : int, optional
+        If positive, plot normalized decomposition error vs. scanned ``omega``.
+
+    Returns
+    -------
+    tuple
+        ``(Z, H, om_opt, min_err)``.
     """
     q = np.asarray(Q, dtype=float)
     niter = 10

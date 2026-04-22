@@ -18,6 +18,18 @@ def co_sync(P1, P2, n, m):
     :math:`\rho_{n:m}=\left|\langle e^{i(n\phi_1-m\phi_2)}\rangle\right|`.
     Values near 1 indicate strong phase locking of order :math:`n:m`, while
     values near 0 indicate weak or absent locking.
+
+    Parameters
+    ----------
+    P1, P2 : array_like
+        Phase or protophase time series of equal length.
+    n, m : int
+        Integer synchronization orders.
+
+    Returns
+    -------
+    float
+        Estimated synchronization index in ``[0, 1]``.
     """
     p1 = _as_1d(P1)
     p2 = _as_1d(P2)
@@ -29,6 +41,18 @@ def co_sync3(P1, P2, P3, n, m, l):
 
     The estimator is
     :math:`\rho_{n:m:l}=\left|\langle e^{i(n\phi_1+m\phi_2+l\phi_3)}\rangle\right|`.
+
+    Parameters
+    ----------
+    P1, P2, P3 : array_like
+        Phase or protophase time series of equal length.
+    n, m, l : int
+        Integer synchronization orders.
+
+    Returns
+    -------
+    float
+        Estimated synchronization index in ``[0, 1]``.
     """
     p1 = _as_1d(P1)
     p2 = _as_1d(P2)
@@ -41,6 +65,19 @@ def co_maxsync(theta1, theta2, or_):
 
     Returns the full matrix :math:`M[n,m]=\rho_{n:m}` plus the maximum value and
     corresponding integer orders.
+
+    Parameters
+    ----------
+    theta1, theta2 : array_like
+        Phase/protophase time series.
+    or_ : int
+        Maximum order to scan.
+
+    Returns
+    -------
+    tuple
+        ``(M_SyncIn, maxind, n_theta1, m_theta2)`` where ``M_SyncIn`` has shape
+        ``(or_, or_)``.
     """
     t1 = _as_1d(theta1)
     t2 = _as_1d(theta2)
@@ -65,6 +102,19 @@ def co_maxsync3(theta1, theta2, theta3, or_):
     Scanned domain follows DAMOCO convention:
     :math:`n\in[0,\mathrm{or}]`, :math:`m,l\in[-\mathrm{or},\mathrm{or}]`.
     The all-zero tuple is excluded from the maximization criterion.
+
+    Parameters
+    ----------
+    theta1, theta2, theta3 : array_like
+        Phase/protophase time series.
+    or_ : int
+        Maximum absolute order to scan.
+
+    Returns
+    -------
+    tuple
+        ``(M_SyncIn, maxind, n_theta1, m_theta2, l_theta3)`` where
+        ``M_SyncIn`` has shape ``(or_+1, 2*or_+1, 2*or_+1)``.
     """
     t1 = _as_1d(theta1)
     t2 = _as_1d(theta2)

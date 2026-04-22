@@ -22,6 +22,25 @@ def co_fbtransf1(theta, nfft=80, alpha=0.05, ngrid=50):
     Uses
     :math:`\phi=\theta+2\sum_{k=1}^{K}e^{-\frac{1}{2}k^2\alpha^2}\Im\left[S_k\frac{e^{ik\theta}-1}{k}\right]`
     where :math:`S_k` are empirical Fourier coefficients of protophase density.
+
+    Parameters
+    ----------
+    theta : array_like
+        Input protophase trajectory.
+    nfft : int, default=80
+        Number of Fourier harmonics :math:`K` used for correction.
+    alpha : float, default=0.05
+        Gaussian smoothing width in harmonic domain. Larger values suppress
+        high-order harmonics more strongly.
+    ngrid : int, default=50
+        Number of points for returning sampled phase-density correction
+        :math:`\sigma(\theta)` on :math:`[0, 2\pi]`.
+
+    Returns
+    -------
+    tuple
+        ``(phi, arg, sigma)`` where ``phi`` is transformed phase, ``arg`` is
+        the angular grid, and ``sigma`` is the estimated phase-density profile.
     """
     th = _as_1d(theta)
     Spl = np.zeros(nfft, dtype=complex)
@@ -52,6 +71,19 @@ def co_fbtrT(theta, ngrid=50):
 
     Computes :math:`S_k` and chooses optimal truncation index by minimizing the
     Tenreiro criterion before applying unsmoothed Fourier correction.
+
+    Parameters
+    ----------
+    theta : array_like
+        Input protophase trajectory.
+    ngrid : int, default=50
+        Number of samples used for the returned density profile.
+
+    Returns
+    -------
+    tuple
+        ``(phi, arg, sigma)`` with phase estimate ``phi``, grid ``arg``, and
+        density correction ``sigma``.
     """
     th = _as_1d(theta)
     nfft = 100
@@ -87,6 +119,21 @@ def co_distproto(x, NV):
 
     Defines cycles by Poincare-section crossings with normal vector ``NV`` and
     maps cumulative arc-length along each cycle to :math:`[0,2\pi)`.
+
+    Parameters
+    ----------
+    x : array_like
+        Complex signal or real 2D embedding with shape ``(2, N)`` (or
+        transposed ``(N, 2)``).
+    NV : array_like
+        Normal vector of the Poincare section in embedding space.
+
+    Returns
+    -------
+    tuple
+        ``(theta, Start, Stop)`` where ``theta`` is unwrapped protophase and
+        ``Start``/``Stop`` delimit the valid interval between first and last
+        complete section crossings.
     """
     xin = np.asarray(x)
     nv = _as_1d(NV)
@@ -143,6 +190,26 @@ def co_hilbproto(x, fignum=0, x0=0.0, y0=0.0, ntail=1000):
     After edge trimming and optional origin shift, computes
     :math:`\theta=\arg(x+i\mathcal{H}[x]) \mod 2\pi` and reports minimum
     instantaneous amplitude as phase-quality indicator.
+
+    Parameters
+    ----------
+    x : array_like
+        Scalar oscillatory time series.
+    fignum : int, default=0
+        Figure number for optional embedding plot. Plotting is disabled when
+        set to ``0``.
+    x0, y0 : float, default=0.0
+        Optional shift of embedding origin before angle extraction.
+    ntail : int, default=1000
+        Number of samples trimmed from both edges to reduce Hilbert transform
+        boundary artifacts.
+
+    Returns
+    -------
+    tuple
+        ``(theta, minampl)`` where ``theta`` is protophase and ``minampl`` is
+        the minimum embedding amplitude (small values indicate poor phase
+        definition).
     """
     xx = _as_1d(x)
     ht = hilbert(xx)
@@ -173,6 +240,21 @@ def co_mmzproto(x, pl=0):
 
     Uses four events per cycle (maximum, zero-crossing, minimum, zero-crossing),
     then linearly interpolates phase between marker times.
+
+    Parameters
+    ----------
+    x : array_like
+        Scalar oscillatory signal.
+    pl : int, default=0
+        If ``1``, produce diagnostic plots of marker consistency and resulting
+        phase trajectories.
+
+    Returns
+    -------
+    tuple
+        ``(theta, START, STOP)`` on successful extraction. If marker detection
+        is inconsistent, returns ``(array([nan]), nan, nan)`` and emits a
+        warning, matching MATLAB behavior.
     """
     xx = _as_1d(x)
     gx = np.diff(xx)
@@ -265,6 +347,22 @@ def _av_comp(H, theta, N, PL):
     r"""Compute Fourier coefficients of the average cycle.
 
     Computes :math:`C_n=\frac{\sum H e^{-in\theta}\dot\theta}{\theta_{end}-\theta_{start}}`.
+
+    Parameters
+    ----------
+    H : array_like
+        Complex embedding values.
+    theta : array_like
+        Unwrapped phase values.
+    N : int
+        Maximum harmonic index.
+    PL : int
+        Diagnostic plotting flag (``1`` enables plots).
+
+    Returns
+    -------
+    numpy.ndarray
+        Complex Fourier coefficients ``Cav`` of length ``N + 1``.
     """
     th = _as_1d(theta)
     hh = np.ravel(H)
@@ -293,6 +391,25 @@ def _ERav(phi, Cav, H, theta, alpha):
 
     Objective:
     :math:`|H-Z(\phi)|^2+\alpha|e^{i\phi}-e^{i\theta}|^2`.
+
+    Parameters
+    ----------
+    phi : float
+        Candidate refined phase.
+    Cav : array_like
+        Average-cycle Fourier coefficients.
+    H : complex
+        Current complex embedding sample.
+    theta : float
+        Initial protophase at the same sample.
+    alpha : float
+        Regularization weight constraining refined phase to remain near
+        ``theta`` on the unit circle.
+
+    Returns
+    -------
+    float
+        Scalar objective value minimized in :func:`co_avcyc`.
     """
     N = np.arange(len(Cav))
     Z = np.sum(Cav * np.exp(1j * N * phi))
@@ -304,6 +421,25 @@ def co_avcyc(x, theta, N, PL=0, alpha=0.0):
 
     For each sample, minimizes the average-cycle projection error in a local
     neighborhood around initial protophase estimate ``theta``.
+
+    Parameters
+    ----------
+    x : array_like
+        Scalar signal used to form Hilbert embedding.
+    theta : array_like
+        Initial protophase estimate aligned with ``x``.
+    N : int
+        Maximum harmonic for average-cycle reconstruction.
+    PL : int, default=0
+        Diagnostic plotting flag (``1`` enables plots).
+    alpha : float, default=0.0
+        Regularization factor in the local optimization objective.
+
+    Returns
+    -------
+    tuple
+        ``(phi, Cav)`` where ``phi`` is refined phase and ``Cav`` are average
+        cycle Fourier coefficients.
     """
     xx = _as_1d(x)
     th = _as_1d(theta)

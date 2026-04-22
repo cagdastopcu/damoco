@@ -19,6 +19,18 @@ def co_dirin(N1, N2, omeg1, omeg2):
     Defines normalized coupling strengths :math:`c_1=N_1/\omega_1`,
     :math:`c_2=N_2/\omega_2` and returns
     :math:`D=(c_2-c_1)/(c_1+c_2)`.
+
+    Parameters
+    ----------
+    N1, N2 : float
+        Coupling norms for the two oscillators.
+    omeg1, omeg2 : float
+        Autonomous frequency estimates.
+
+    Returns
+    -------
+    float
+        Directionality index in ``[-1, 1]``.
     """
     c1 = N1 / omeg1
     c2 = N2 / omeg2
@@ -38,6 +50,16 @@ def co_dirpar(Fcoef1, Fcoef2):
     For each oscillator, the external contribution is quantified by
     :math:`\sqrt{\sum_{n,m} m^2 |F_{n,m}|^2}` and combined into
     :math:`D=(n_2-n_1)/(n_1+n_2)`.
+
+    Parameters
+    ----------
+    Fcoef1, Fcoef2 : array_like
+        Fourier coefficient matrices for two oscillator models.
+
+    Returns
+    -------
+    float
+        Directionality index in ``[-1, 1]``.
     """
     F1 = np.asarray(Fcoef1)
     F2 = np.asarray(Fcoef2)
@@ -65,6 +87,16 @@ def co_cor_diff(Q1, Q2):
     :math:`\mathrm{COR}=\frac{\langle Q_1,Q_2\rangle}{\|Q_1\|\|Q_2\|}` and
     :math:`\mathrm{DIFF}=\frac{\|Q_1-Q_2\|}{\|Q_1\|+\|Q_2\|}` using trapezoidal
     integration on the 2D grid.
+
+    Parameters
+    ----------
+    Q1, Q2 : array_like
+        Coupling functions sampled on same periodic grid.
+
+    Returns
+    -------
+    tuple
+        ``(COR, DIFF)`` as floats.
     """
     q1 = np.asarray(Q1, dtype=float)
     q2 = np.asarray(Q2, dtype=float)
@@ -84,6 +116,16 @@ def co_fcfcor(Qcoef1, Qcoef2):
 
     Removes the autonomous term :math:`Q_{0,0}` and evaluates the DAMOCO
     Fourier-space correlation with conjugate-reversed index alignment.
+
+    Parameters
+    ----------
+    Qcoef1, Qcoef2 : array_like
+        Complex Fourier coefficient matrices with shape ``(2N+1, 2N+1)``.
+
+    Returns
+    -------
+    float
+        Correlation value.
     """
     q1 = np.asarray(Qcoef1, dtype=complex).copy()
     q2 = np.asarray(Qcoef2, dtype=complex).copy()
@@ -102,6 +144,16 @@ def co_gcfcor(q1, q2):
     r"""Compute correlation of two coupling functions sampled on a periodic grid.
 
     Means are removed before evaluating the normalized 2D inner product.
+
+    Parameters
+    ----------
+    q1, q2 : array_like
+        Grid coupling functions with periodic endpoint duplication.
+
+    Returns
+    -------
+    float
+        Correlation value.
     """
     a = np.asarray(q1, dtype=float)
     b = np.asarray(q2, dtype=float)
@@ -122,6 +174,18 @@ def co_fcfcormax(Qcoef1, Qcoef2, ngrid=100):
     :math:`C(\Delta_1,\Delta_2)` on a uniform :math:`ngrid\times ngrid` shift grid
     and returns maximal correlation together with optimal shifts and shifted
     coefficients :math:`Q^{\mathrm{shift}}_{n,m}=e^{i(n\Delta_1+m\Delta_2)}Q_{n,m}`.
+
+    Parameters
+    ----------
+    Qcoef1, Qcoef2 : array_like
+        Complex Fourier coefficient matrices.
+    ngrid : int, optional
+        Number of shift samples per phase dimension.
+
+    Returns
+    -------
+    tuple
+        ``(COR, Delta1, Delta2, Qcoef2_shift)``.
     """
     q1 = np.asarray(Qcoef1, dtype=complex).copy()
     q2 = np.asarray(Qcoef2, dtype=complex).copy()
@@ -162,6 +226,16 @@ def co_gcfcormax(q1, q2):
 
     Uses circular shifts of the second function over all grid offsets and returns
     maximal correlation, best self/external phase shifts, and the shifted grid.
+
+    Parameters
+    ----------
+    q1, q2 : array_like
+        Grid coupling functions with periodic endpoint duplication.
+
+    Returns
+    -------
+    tuple
+        ``(COR, Delta_self, Delta_ext, q2_shift)``.
     """
     a = np.asarray(q1, dtype=float)
     b = np.asarray(q2, dtype=float)
@@ -205,6 +279,16 @@ def co_fnorm(Qcoef):
 
     The autonomous frequency estimate is :math:`\omega=\Re(Q_{0,0})`.
     The coupling norm is computed after removing :math:`Q_{0,0}`.
+
+    Parameters
+    ----------
+    Qcoef : array_like
+        Complex Fourier coefficient matrix.
+
+    Returns
+    -------
+    tuple
+        ``(Nrmq, omega)``.
     """
     q = np.asarray(Qcoef, dtype=complex).copy()
     N = (q.shape[0] - 1) // 2
@@ -220,6 +304,16 @@ def co_gnorm(q):
     Computes :math:`\omega=\langle q\rangle` and
     :math:`\|q-\omega\|` with DAMOCO grid normalization by
     :math:`(ngrid-1)^2`.
+
+    Parameters
+    ----------
+    q : array_like
+        Grid representation of phase dynamics/coupling.
+
+    Returns
+    -------
+    tuple
+        ``(Nrmq, omega)``.
     """
     qq = np.asarray(q, dtype=float)
     ngrid = qq.shape[0]
