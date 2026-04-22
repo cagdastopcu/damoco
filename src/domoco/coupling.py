@@ -1,4 +1,8 @@
-"""Fourier/kernel coupling-function estimators and network-level analyzers."""
+"""Fourier/kernel coupling-function estimators and network-level analyzers.
+
+Includes pairwise and triadic Fourier regression estimators, partial norm/
+partial derivative coupling summaries, and kernel-smoothing alternatives.
+"""
 
 from __future__ import annotations
 
@@ -12,7 +16,12 @@ from .synchrony import co_maxsync3
 
 
 def co_fcplfct1(phi1, phi2, dphi1, N, ngrid=100):
-    """Estimate one 2D coupling function via Fourier-series regression."""
+    r"""Estimate one coupling function by Fourier regression up to order ``N``.
+
+    Fits coefficients in
+    :math:`q(\phi_1,\phi_2)=\sum_{n,m=-N}^{N} Q_{n,m}e^{i(n\phi_1+m\phi_2)}`
+    by solving the DAMOCO normal equations in complex form.
+    """
     p1 = np.unwrap(_as_1d(phi1))
     p2 = np.unwrap(_as_1d(phi2))
     dp1 = _as_1d(dphi1)
@@ -58,7 +67,11 @@ def co_fcplfct1(phi1, phi2, dphi1, N, ngrid=100):
 
 
 def co_fcplfct2(phi1, phi2, dphi1, dphi2, N, ngrid=100):
-    """Estimate two 2D coupling functions via Fourier-series regression."""
+    r"""Estimate both pairwise coupling functions by Fourier regression.
+
+    Solves for two right-hand sides simultaneously (from :math:`\dot\phi_1`,
+    :math:`\dot\phi_2`) using the same regression matrix, matching MATLAB logic.
+    """
     p1 = np.unwrap(_as_1d(phi1))
     p2 = np.unwrap(_as_1d(phi2))
     dp1 = _as_1d(dphi1)
@@ -113,7 +126,12 @@ def co_fcplfct2(phi1, phi2, dphi1, dphi2, N, ngrid=100):
 
 
 def co_fcpltri(phi1, phi2, phi3, Dphi1, Dphi2, Dphi3, N):
-    """Estimate three 3D coupling functions for a triad via Fourier fitting."""
+    r"""Estimate triadic coupling functions via 3D Fourier fitting.
+
+    Uses expansion
+    :math:`\sum_{n,m,k=-N}^{N}Q_{n,m,k}e^{i(n\phi_1+m\phi_2+k\phi_3)}`
+    for each oscillator's phase dynamics with DAMOCO index conventions.
+    """
     p1 = np.unwrap(_as_1d(phi1))
     p2 = np.unwrap(_as_1d(phi2))
     p3 = np.unwrap(_as_1d(phi3))
@@ -173,7 +191,12 @@ def co_fcpltri(phi1, phi2, phi3, Dphi1, Dphi2, Dphi3, N):
 
 
 def _co_3to2(Q, N, thresh):
-    """Internal helper to compute partial norms/derivatives from triadic coefficients."""
+    r"""Internal helper computing partial norms and derivative-based strengths.
+
+    Applies thresholding on :math:`|Q|`, then computes:
+    pairwise partial norms, triple-only norm contribution, partial derivative
+    strengths, and total norm.
+    """
     QQ = np.asarray(Q, dtype=complex).copy()
     thresh_val = np.max(np.abs(QQ)) * thresh / 100.0
     QQ[np.abs(QQ) < thresh_val] = 0.0
@@ -203,7 +226,13 @@ def _co_3to2(Q, N, thresh):
 
 
 def co_tricplfan(Qcoef1, Qcoef2, Qcoef3, meth=1, thresh=2):
-    """Analyze 3-oscillator coupling structure from triadic Fourier coefficients."""
+    r"""Analyze 3-oscillator coupling structure from triadic coefficients.
+
+    ``meth`` selects:
+    1/2 -> partial norms (absolute / normalized by :math:`\omega`),
+    3/4 -> partial derivatives (absolute / normalized by :math:`\omega`).
+    Returns coupling matrix, total norms, and autonomous frequencies.
+    """
     Q1 = np.asarray(Qcoef1, dtype=complex).copy()
     Q2 = np.asarray(Qcoef2, dtype=complex).copy()
     Q3 = np.asarray(Qcoef3, dtype=complex).copy()
@@ -244,7 +273,11 @@ def co_tricplfan(Qcoef1, Qcoef2, Qcoef3, meth=1, thresh=2):
 
 
 def co_nettri(PHI, PHI_dot, N, meth=1, thresh=2):
-    """Estimate directed coupling matrix for networks by scanning all triplets."""
+    r"""Estimate directed network coupling by triplet decomposition.
+
+    For each oscillator triplet, fits triadic Fourier models and aggregates pair
+    effects by the minimum over all triplets containing each ordered pair.
+    """
     phi = np.asarray(PHI, dtype=float)
     phidot = np.asarray(PHI_dot, dtype=float)
     if phi.shape[1] < phi.shape[0]:
@@ -298,7 +331,10 @@ def co_nettri(PHI, PHI_dot, N, meth=1, thresh=2):
 
 
 def _kernel_cpl(phi1, phi2, ngrid, al_x, al_y):
-    """Internal kernel precomputation for kernel-based coupling estimators."""
+    r"""Internal periodic kernel precomputation for kernel estimators.
+
+    Uses kernels :math:`K(\Delta)=\exp(\alpha(\cos\Delta-1))` in each phase.
+    """
     ng1 = ngrid - 1
     x = PI2 * np.arange(ng1) / ng1
     p1 = _as_1d(phi1)
@@ -310,7 +346,12 @@ def _kernel_cpl(phi1, phi2, ngrid, al_x, al_y):
 
 
 def co_kcplfct1(phi1, phi2, phi1_dot, ngrid, fignum=0, al_x=None, al_y=None):
-    """Estimate one coupling function from phases using kernel smoothing."""
+    r"""Estimate one coupling function with periodic kernel smoothing.
+
+    Computes weighted conditional mean
+    :math:`q_1(\phi_1,\phi_2)=\frac{\sum_t \dot\phi_1(t)K_xK_y}{\sum_t K_xK_y}`
+    on a periodic grid.
+    """
     ng1 = ngrid - 1
     if al_x is None:
         al_x = (ng1 / PI2) ** 2
@@ -343,7 +384,12 @@ def co_kcplfct1(phi1, phi2, phi1_dot, ngrid, fignum=0, al_x=None, al_y=None):
 
 
 def co_kcplfct2(phi1, phi2, phi1_dot, phi2_dot, ngrid, al_x=None, al_y=None):
-    """Estimate two coupling functions from phases using kernel smoothing."""
+    r"""Estimate both coupling functions with periodic kernel smoothing.
+
+    Same kernel denominator is reused for two numerators from
+    :math:`\dot\phi_1` and :math:`\dot\phi_2`; output orientation matches
+    DAMOCO conventions.
+    """
     ng1 = ngrid - 1
     if al_x is None:
         al_x = (ng1 / PI2) ** 2

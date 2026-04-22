@@ -21,6 +21,11 @@ The project keeps the original `co_*` function names to make migration from MATL
 pip install -e .[dev]
 ```
 
+## Rigorous Background
+
+- Mathematical theory: [THEORY.md](THEORY.md)
+- Validation methodology: [VALIDATION.md](VALIDATION.md)
+
 ## Package Structure
 
 - `domoco.synchrony`: synchronization indices and max-scan utilities.

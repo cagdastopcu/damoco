@@ -1,4 +1,8 @@
-"""Correlation, norm, and directionality metrics for coupling analysis."""
+"""Correlation, norm, and directionality metrics for coupling analysis.
+
+The definitions in this module mirror DAMOCO formulas on Fourier coefficients
+and periodic phase grids.
+"""
 
 from __future__ import annotations
 
@@ -10,7 +14,12 @@ from ._utils import _trapz2
 
 
 def co_dirin(N1, N2, omeg1, omeg2):
-    """Compute directionality index from coupling norms and autonomous frequencies."""
+    r"""Compute directionality index from coupling norms and autonomous frequencies.
+
+    Defines normalized coupling strengths :math:`c_1=N_1/\omega_1`,
+    :math:`c_2=N_2/\omega_2` and returns
+    :math:`D=(c_2-c_1)/(c_1+c_2)`.
+    """
     c1 = N1 / omeg1
     c2 = N2 / omeg2
     if c1 + c2 < 0.02:
@@ -24,7 +33,12 @@ def co_dirin(N1, N2, omeg1, omeg2):
 
 
 def co_dirpar(Fcoef1, Fcoef2):
-    """Compute directionality index from Fourier coefficients via partial derivatives."""
+    r"""Compute directionality from external-phase derivative norms.
+
+    For each oscillator, the external contribution is quantified by
+    :math:`\sqrt{\sum_{n,m} m^2 |F_{n,m}|^2}` and combined into
+    :math:`D=(n_2-n_1)/(n_1+n_2)`.
+    """
     F1 = np.asarray(Fcoef1)
     F2 = np.asarray(Fcoef2)
     or_ = (F1.shape[0] - 1) // 2
@@ -45,7 +59,13 @@ def co_dirpar(Fcoef1, Fcoef2):
 
 
 def co_cor_diff(Q1, Q2):
-    """Compute correlation and normalized difference between two grid coupling functions."""
+    r"""Compute grid-function correlation and normalized difference.
+
+    After removing means and periodic duplicate boundary points, computes
+    :math:`\mathrm{COR}=\frac{\langle Q_1,Q_2\rangle}{\|Q_1\|\|Q_2\|}` and
+    :math:`\mathrm{DIFF}=\frac{\|Q_1-Q_2\|}{\|Q_1\|+\|Q_2\|}` using trapezoidal
+    integration on the 2D grid.
+    """
     q1 = np.asarray(Q1, dtype=float)
     q2 = np.asarray(Q2, dtype=float)
     q1 = q1 - np.mean(q1)
@@ -60,7 +80,11 @@ def co_cor_diff(Q1, Q2):
 
 
 def co_fcfcor(Qcoef1, Qcoef2):
-    """Compute correlation of two coupling functions represented by Fourier coefficients."""
+    r"""Compute Fourier-domain coupling-function correlation.
+
+    Removes the autonomous term :math:`Q_{0,0}` and evaluates the DAMOCO
+    Fourier-space correlation with conjugate-reversed index alignment.
+    """
     q1 = np.asarray(Qcoef1, dtype=complex).copy()
     q2 = np.asarray(Qcoef2, dtype=complex).copy()
     S = q1.shape[0]
@@ -75,7 +99,10 @@ def co_fcfcor(Qcoef1, Qcoef2):
 
 
 def co_gcfcor(q1, q2):
-    """Compute correlation of two coupling functions given on a grid."""
+    r"""Compute correlation of two coupling functions sampled on a periodic grid.
+
+    Means are removed before evaluating the normalized 2D inner product.
+    """
     a = np.asarray(q1, dtype=float)
     b = np.asarray(q2, dtype=float)
     a = a[:-1, :-1]
@@ -89,7 +116,13 @@ def co_gcfcor(q1, q2):
 
 
 def co_fcfcormax(Qcoef1, Qcoef2, ngrid=100):
-    """Maximize Fourier-domain coupling-function correlation over phase shifts."""
+    r"""Maximize Fourier-domain correlation over relative phase shifts.
+
+    Evaluates
+    :math:`C(\Delta_1,\Delta_2)` on a uniform :math:`ngrid\times ngrid` shift grid
+    and returns maximal correlation together with optimal shifts and shifted
+    coefficients :math:`Q^{\mathrm{shift}}_{n,m}=e^{i(n\Delta_1+m\Delta_2)}Q_{n,m}`.
+    """
     q1 = np.asarray(Qcoef1, dtype=complex).copy()
     q2 = np.asarray(Qcoef2, dtype=complex).copy()
     S = q1.shape[0]
@@ -125,7 +158,11 @@ def co_fcfcormax(Qcoef1, Qcoef2, ngrid=100):
 
 
 def co_gcfcormax(q1, q2):
-    """Maximize grid-domain coupling-function correlation over phase shifts."""
+    r"""Maximize grid-domain correlation over periodic shifts.
+
+    Uses circular shifts of the second function over all grid offsets and returns
+    maximal correlation, best self/external phase shifts, and the shifted grid.
+    """
     a = np.asarray(q1, dtype=float)
     b = np.asarray(q2, dtype=float)
     a = a[:-1, :-1]
@@ -164,7 +201,11 @@ def co_gcfcormax(q1, q2):
 
 
 def co_fnorm(Qcoef):
-    """Return norm of Fourier-represented coupling function and its constant term."""
+    r"""Return Fourier coupling norm and autonomous frequency estimate.
+
+    The autonomous frequency estimate is :math:`\omega=\Re(Q_{0,0})`.
+    The coupling norm is computed after removing :math:`Q_{0,0}`.
+    """
     q = np.asarray(Qcoef, dtype=complex).copy()
     N = (q.shape[0] - 1) // 2
     omega = float(np.real(q[N, N]))
@@ -174,7 +215,12 @@ def co_fnorm(Qcoef):
 
 
 def co_gnorm(q):
-    """Return norm and mean value of a coupling function given on a grid."""
+    r"""Return grid coupling norm and mean frequency term.
+
+    Computes :math:`\omega=\langle q\rangle` and
+    :math:`\|q-\omega\|` with DAMOCO grid normalization by
+    :math:`(ngrid-1)^2`.
+    """
     qq = np.asarray(q, dtype=float)
     ngrid = qq.shape[0]
     ng1_2 = (ngrid - 1) * (ngrid - 1)

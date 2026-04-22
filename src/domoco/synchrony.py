@@ -1,4 +1,8 @@
-"""Synchronization index utilities (2-oscillator and 3-oscillator)."""
+"""Synchronization index utilities.
+
+All synchronization indices are computed as magnitudes of circular means of
+complex exponentials, exactly as in the DAMOCO MATLAB reference implementation.
+"""
 
 from __future__ import annotations
 
@@ -8,14 +12,24 @@ from ._utils import _as_1d
 
 
 def co_sync(P1, P2, n, m):
-    """Compute n:m synchronization index from two phase/protophase signals."""
+    r"""Compute the :math:`n:m` synchronization index.
+
+    The estimator is
+    :math:`\rho_{n:m}=\left|\langle e^{i(n\phi_1-m\phi_2)}\rangle\right|`.
+    Values near 1 indicate strong phase locking of order :math:`n:m`, while
+    values near 0 indicate weak or absent locking.
+    """
     p1 = _as_1d(P1)
     p2 = _as_1d(P2)
     return float(np.abs(np.mean(np.exp(1j * (n * p1 - m * p2)))))
 
 
 def co_sync3(P1, P2, P3, n, m, l):
-    """Compute n:m:l synchronization index from three phase/protophase signals."""
+    r"""Compute the :math:`n:m:l` synchronization index for three phases.
+
+    The estimator is
+    :math:`\rho_{n:m:l}=\left|\langle e^{i(n\phi_1+m\phi_2+l\phi_3)}\rangle\right|`.
+    """
     p1 = _as_1d(P1)
     p2 = _as_1d(P2)
     p3 = _as_1d(P3)
@@ -23,7 +37,11 @@ def co_sync3(P1, P2, P3, n, m, l):
 
 
 def co_maxsync(theta1, theta2, or_):
-    """Scan all n,m in [1..or_] and return synchronization matrix and maximum."""
+    r"""Scan orders :math:`n,m\in\{1,\dots,\mathrm{or}\}` and locate maximum.
+
+    Returns the full matrix :math:`M[n,m]=\rho_{n:m}` plus the maximum value and
+    corresponding integer orders.
+    """
     t1 = _as_1d(theta1)
     t2 = _as_1d(theta2)
     M_SyncIn = np.zeros((or_, or_), dtype=float)
@@ -42,7 +60,12 @@ def co_maxsync(theta1, theta2, or_):
 
 
 def co_maxsync3(theta1, theta2, theta3, or_):
-    """Scan 3-way synchronization orders and return max index and corresponding tuple."""
+    r"""Scan 3-way integer orders and locate maximal triadic synchronization.
+
+    Scanned domain follows DAMOCO convention:
+    :math:`n\in[0,\mathrm{or}]`, :math:`m,l\in[-\mathrm{or},\mathrm{or}]`.
+    The all-zero tuple is excluded from the maximization criterion.
+    """
     t1 = _as_1d(theta1)
     t2 = _as_1d(theta2)
     t3 = _as_1d(theta3)

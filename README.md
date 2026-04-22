@@ -19,7 +19,7 @@
 
 ## Install
 
-Published package (after release to PyPI):
+Published package:
 
 ```bash
 pip install domoco
@@ -46,4 +46,6 @@ pytest -q
 ## Documentation
 
 - Full user/developer docs: [docs/DOCUMENTATION.md](docs/DOCUMENTATION.md)
+- Mathematical theory: [docs/THEORY.md](docs/THEORY.md)
+- Validation guide: [docs/VALIDATION.md](docs/VALIDATION.md)
 - PyPI release guide: [docs/PUBLISH.md](docs/PUBLISH.md)

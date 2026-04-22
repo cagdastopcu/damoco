@@ -1,4 +1,8 @@
-"""Phase-derivative estimation and model quality/decomposition utilities."""
+"""Phase-derivative estimation and model quality/decomposition utilities.
+
+Implements Savitzky-Golay differentiation, residual decomposition of phase
+models, and iterative PRC-forcing factorization used in DAMOCO workflows.
+"""
 
 from __future__ import annotations
 
@@ -13,7 +17,7 @@ from .metrics import co_gnorm
 
 
 def _sg_diff(phi: np.ndarray, fsample: float) -> tuple[np.ndarray, np.ndarray]:
-    """Differentiate unwrapped phase using Savitzky-Golay derivative coefficients."""
+    """Differentiate an unwrapped phase sequence with Savitzky-Golay filtering."""
     norder = 4
     sl = 4
     wl = 2 * sl + 1
@@ -25,14 +29,22 @@ def _sg_diff(phi: np.ndarray, fsample: float) -> tuple[np.ndarray, np.ndarray]:
 
 
 def co_phidot1(phi, fsample):
-    """Estimate derivative of one phase time series (Savitzky-Golay)."""
+    r"""Estimate instantaneous frequency from one phase time series.
+
+    Computes :math:`\dot\phi(t)` by Savitzky-Golay local polynomial derivative
+    (order 4, window length 9), matching MATLAB defaults.
+    """
     p = _as_1d(phi)
     d, p_cut = _sg_diff(p, fsample)
     return d, p_cut
 
 
 def co_phidot2(phi1, phi2, fsample):
-    """Estimate derivatives of two phase time series (Savitzky-Golay)."""
+    r"""Estimate instantaneous frequencies for two phase time series.
+
+    Applies the same Savitzky-Golay differentiator to each input phase and
+    returns truncated aligned outputs (boundary points removed).
+    """
     p1 = _as_1d(phi1)
     p2 = _as_1d(phi2)
     d1, p1c = _sg_diff(p1, fsample)
@@ -41,7 +53,11 @@ def co_phidot2(phi1, phi2, fsample):
 
 
 def co_phidot3(phi1, phi2, phi3, fsample):
-    """Estimate derivatives of three phase time series (Savitzky-Golay)."""
+    r"""Estimate instantaneous frequencies for three phase time series.
+
+    Uses identical differentiator and truncation for all channels to preserve
+    temporal alignment of :math:`\dot\phi_1,\dot\phi_2,\dot\phi_3`.
+    """
     p1 = _as_1d(phi1)
     p2 = _as_1d(phi2)
     p3 = _as_1d(phi3)
@@ -52,7 +68,7 @@ def co_phidot3(phi1, phi2, phi3, fsample):
 
 
 def _dPhi(Q, phi1, phi2):
-    """Interpolate coupling function on wrapped phase coordinates."""
+    r"""Interpolate :math:`Q(\phi_1,\phi_2)` on wrapped phase coordinates."""
     qq = np.asarray(Q, dtype=float)
     s1 = qq.shape[0] - 1
     arg = PI2 * np.arange(s1 + 1) / s1
@@ -70,7 +86,12 @@ def _dPhi(Q, phi1, phi2):
 
 
 def co_resid_decomp(dPhi1, Phi1, Phi2, q):
-    """Decompose phase derivative into model-reconstructed part and residual."""
+    r"""Decompose measured derivative into model and residual parts.
+
+    Reconstructs :math:`\dot\phi_1^{\text{synth}}=q(\phi_1,\phi_2)` by bilinear
+    interpolation on the periodic grid and returns residual
+    :math:`r=\dot\phi_1-\dot\phi_1^{\text{synth}}` with standard deviations.
+    """
     dphi1 = _as_1d(dPhi1)
     phi1 = _as_1d(Phi1)
     phi2 = _as_1d(Phi2)
@@ -83,7 +104,7 @@ def co_resid_decomp(dPhi1, Phi1, Phi2, q):
 
 
 def _decomp(F: np.ndarray, kmax: int, ngrid: int, niter: int) -> tuple[np.ndarray, np.ndarray]:
-    """Iterative rank-1 decomposition used by `co_prciter`."""
+    """Iterative rank-1 factorization helper for `co_prciter`."""
     H0 = F[kmax, :].copy()
     Z = np.zeros(ngrid, dtype=float)
     H = np.zeros(ngrid, dtype=float)
@@ -97,7 +118,12 @@ def _decomp(F: np.ndarray, kmax: int, ngrid: int, niter: int) -> tuple[np.ndarra
 
 
 def co_prciter(Q, ngrid, fignum=0):
-    """Iteratively decompose Q-omega into Z(phi1)*H(phi2), optimizing omega."""
+    r"""Iteratively decompose :math:`Q-\omega` into :math:`Z(\phi_1)H(\phi_2)`.
+
+    Scans candidate :math:`\omega`, minimizes residual standard deviation, then
+    returns optimal :math:`Z`, :math:`H`, :math:`\omega_{\mathrm{opt}}`, and the
+    minimal decomposition error.
+    """
     q = np.asarray(Q, dtype=float)
     niter = 10
     c1 = 1.0

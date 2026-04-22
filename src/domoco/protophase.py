@@ -1,4 +1,8 @@
-"""Protophase extraction and protophase-to-phase transformation methods."""
+"""Protophase extraction and protophase-to-phase transformation methods.
+
+Implements DAMOCO protophase estimators and Fourier-based protophase-to-phase
+transformations with the same defaults and conventions as MATLAB code.
+"""
 
 from __future__ import annotations
 
@@ -13,7 +17,12 @@ from ._utils import PI2, _as_1d
 
 
 def co_fbtransf1(theta, nfft=80, alpha=0.05, ngrid=50):
-    """Transform protophase to phase using smoothed Fourier coefficients."""
+    r"""Transform protophase to phase with smoothed Fourier correction.
+
+    Uses
+    :math:`\phi=\theta+2\sum_{k=1}^{K}e^{-\frac{1}{2}k^2\alpha^2}\Im\left[S_k\frac{e^{ik\theta}-1}{k}\right]`
+    where :math:`S_k` are empirical Fourier coefficients of protophase density.
+    """
     th = _as_1d(theta)
     Spl = np.zeros(nfft, dtype=complex)
     al2 = alpha * alpha
@@ -39,7 +48,11 @@ def co_fbtransf1(theta, nfft=80, alpha=0.05, ngrid=50):
 
 
 def co_fbtrT(theta, ngrid=50):
-    """Transform protophase to phase with Tenreiro-based harmonic selection."""
+    r"""Transform protophase to phase with Tenreiro-optimal harmonic cutoff.
+
+    Computes :math:`S_k` and chooses optimal truncation index by minimizing the
+    Tenreiro criterion before applying unsmoothed Fourier correction.
+    """
     th = _as_1d(theta)
     nfft = 100
     Spl = np.zeros(nfft, dtype=complex)
@@ -70,7 +83,11 @@ def co_fbtrT(theta, ngrid=50):
 
 
 def co_distproto(x, NV):
-    """Estimate protophase from 2D embedding using covered-distance normalization."""
+    r"""Estimate protophase from 2D embedding by distance normalization.
+
+    Defines cycles by Poincare-section crossings with normal vector ``NV`` and
+    maps cumulative arc-length along each cycle to :math:`[0,2\pi)`.
+    """
     xin = np.asarray(x)
     nv = _as_1d(NV)
     if np.iscomplexobj(xin):
@@ -121,7 +138,12 @@ def co_distproto(x, NV):
 
 
 def co_hilbproto(x, fignum=0, x0=0.0, y0=0.0, ntail=1000):
-    """Estimate protophase using Hilbert-transform embedding and angle extraction."""
+    r"""Estimate protophase from Hilbert embedding angle.
+
+    After edge trimming and optional origin shift, computes
+    :math:`\theta=\arg(x+i\mathcal{H}[x]) \mod 2\pi` and reports minimum
+    instantaneous amplitude as phase-quality indicator.
+    """
     xx = _as_1d(x)
     ht = hilbert(xx)
     ht = ht[ntail : len(ht) - ntail]
@@ -147,7 +169,11 @@ def co_hilbproto(x, fignum=0, x0=0.0, y0=0.0, ntail=1000):
 
 
 def co_mmzproto(x, pl=0):
-    """Estimate protophase by linear interpolation between four marker events."""
+    r"""Estimate protophase via marker-event interpolation.
+
+    Uses four events per cycle (maximum, zero-crossing, minimum, zero-crossing),
+    then linearly interpolates phase between marker times.
+    """
     xx = _as_1d(x)
     gx = np.diff(xx)
     s = np.sign(gx[:-1]) - np.sign(gx[1:])
@@ -236,7 +262,10 @@ def co_mmzproto(x, pl=0):
 
 
 def _av_comp(H, theta, N, PL):
-    """Compute Fourier coefficients of the average cycle in complex embedding."""
+    r"""Compute Fourier coefficients of the average cycle.
+
+    Computes :math:`C_n=\frac{\sum H e^{-in\theta}\dot\theta}{\theta_{end}-\theta_{start}}`.
+    """
     th = _as_1d(theta)
     hh = np.ravel(H)
     Cav = np.zeros(N + 1, dtype=complex)
@@ -260,14 +289,22 @@ def _av_comp(H, theta, N, PL):
 
 
 def _ERav(phi, Cav, H, theta, alpha):
-    """Objective for average-cycle projection with optional phase-regularization."""
+    r"""Error functional for average-cycle projection.
+
+    Objective:
+    :math:`|H-Z(\phi)|^2+\alpha|e^{i\phi}-e^{i\theta}|^2`.
+    """
     N = np.arange(len(Cav))
     Z = np.sum(Cav * np.exp(1j * N * phi))
     return np.abs(H - Z) ** 2 + alpha * np.abs(np.exp(1j * phi) - np.exp(1j * theta)) ** 2
 
 
 def co_avcyc(x, theta, N, PL=0, alpha=0.0):
-    """Refine protophase by projecting embedding points onto an average cycle."""
+    r"""Refine protophase by projection onto an estimated average cycle.
+
+    For each sample, minimizes the average-cycle projection error in a local
+    neighborhood around initial protophase estimate ``theta``.
+    """
     xx = _as_1d(x)
     th = _as_1d(theta)
     xx = xx / np.max(xx)

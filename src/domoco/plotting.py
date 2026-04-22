@@ -1,4 +1,8 @@
-"""Matplotlib plotting helpers mirroring DAMOCO MATLAB plot utilities."""
+"""Matplotlib plotting helpers mirroring DAMOCO MATLAB plot utilities.
+
+These are visualization wrappers; they do not alter estimated coefficients or
+coupling functions.
+"""
 
 from __future__ import annotations
 
@@ -10,7 +14,7 @@ from ._utils import PI2
 
 
 def co_plotcoef(F, pltype, fignum=None, own_lab=None, ext_lab=None, tit=None):
-    """Plot absolute Fourier coefficient matrix for one oscillator model."""
+    r"""Plot :math:`|F_{n,m}|` or :math:`|Q_{n,m}|` for one oscillator model."""
     FF = np.asarray(F, dtype=complex).copy()
     or_ = (max(FF.shape) - 1) // 2
     n = np.arange(-or_, or_ + 1)
@@ -42,7 +46,7 @@ def co_plotcoef(F, pltype, fignum=None, own_lab=None, ext_lab=None, tit=None):
 
 
 def co_plotcplf(f, pltype, fignum=None, own_lab=None, ext_lab=None, zlab=None, tit=None):
-    """Plot one 2D coupling/protophase function as a 3D surface."""
+    r"""Plot one function :math:`q(\phi_{own},\phi_{ext})` (or protophase analog)."""
     ff = np.asarray(f, dtype=float)
     ngrid = max(ff.shape)
     arg = PI2 * np.arange(ngrid) / (ngrid - 1)
@@ -83,7 +87,7 @@ def co_plot2coef(
     ext_lab_2=None,
     tit_2=None,
 ):
-    """Plot absolute Fourier coefficient matrices of two oscillator models side by side."""
+    r"""Plot two coefficient matrices side by side with shared color scale."""
     A = np.asarray(F1, dtype=complex).copy()
     B = np.asarray(F2, dtype=complex).copy()
     or_ = (max(A.shape) - 1) // 2
@@ -143,7 +147,7 @@ def co_plot2coef(
 
 
 def co_plot2cplf(f1, f2, pltype, fignum=None, xl=None, yl=None, zl1=None, zl2=None, tit=None):
-    """Plot two coupling/protophase functions side by side as 3D surfaces."""
+    r"""Plot two coupling/protophase surfaces for comparative inspection."""
     a = np.asarray(f1, dtype=float)
     b = np.asarray(f2, dtype=float)
     ngrid = max(a.shape)
@@ -181,7 +185,11 @@ def co_plot2cplf(f1, f2, pltype, fignum=None, xl=None, yl=None, zl1=None, zl2=No
 
 
 def co_plottri(fignum, cpar, thresh=0.07):
-    """Plot triad coupling diagram with directed arrows and thresholding."""
+    r"""Plot triadic directed coupling graph from matrix ``cpar``.
+
+    Entries ``cpar(i,j)`` represent effect of node ``j`` on node ``i``.
+    Edges weaker than ``thresh * max(cpar)`` are omitted.
+    """
     c = np.asarray(cpar, dtype=float).T
     cm = np.max(c)
     fig = plt.figure(num=fignum)
