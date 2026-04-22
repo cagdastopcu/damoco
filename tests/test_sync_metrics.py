@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 
 from damoco import (
     co_cor_diff,
@@ -105,3 +106,17 @@ def test_directionality_indices():
     F2[1, 2] = 0.5
     d2 = co_dirpar(F1, F2)
     assert d2 > 0
+
+
+def test_directionality_handles_zero_frequency():
+    with pytest.warns(RuntimeWarning):
+        d = co_dirin(0.2, 0.4, 0.0, 2.0)
+    assert np.isnan(d)
+
+
+def test_directionality_handles_zero_denominator():
+    F1 = np.zeros((3, 3), dtype=complex)
+    F2 = np.zeros((3, 3), dtype=complex)
+    with pytest.warns(RuntimeWarning):
+        d = co_dirpar(F1, F2)
+    assert np.isnan(d)

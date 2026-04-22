@@ -32,6 +32,15 @@ def co_dirin(N1, N2, omeg1, omeg2):
     float
         Directionality index in ``[-1, 1]``.
     """
+    if (not np.isfinite(omeg1)) or (not np.isfinite(omeg2)) or abs(omeg1) < 1e-12 or abs(omeg2) < 1e-12:
+        warnings.warn(
+            "Directionality index is undefined for zero/non-finite autonomous "
+            "frequency; returning nan.",
+            RuntimeWarning,
+            stacklevel=2,
+        )
+        return float("nan")
+
     c1 = N1 / omeg1
     c2 = N2 / omeg2
     if c1 + c2 < 0.02:
@@ -41,7 +50,15 @@ def co_dirin(N1, N2, omeg1, omeg2):
             RuntimeWarning,
             stacklevel=2,
         )
-    return float((c2 - c1) / (c1 + c2))
+    den = c1 + c2
+    if abs(den) < 1e-12:
+        warnings.warn(
+            "Directionality index denominator is too small; returning nan.",
+            RuntimeWarning,
+            stacklevel=2,
+        )
+        return float("nan")
+    return float((c2 - c1) / den)
 
 
 def co_dirpar(Fcoef1, Fcoef2):
@@ -70,14 +87,22 @@ def co_dirpar(Fcoef1, Fcoef2):
     NP2 = np.sum(m2 * np.abs(F2) ** 2)
     nrm1 = np.sqrt(NP1)
     nrm2 = np.sqrt(NP2)
-    if nrm1 + nrm2 < 0.02:
+    den = nrm1 + nrm2
+    if den < 0.02:
         warnings.warn(
             "The coupling is very weak or the systems are not coupled; "
             "directionality index may be unreliable.",
             RuntimeWarning,
             stacklevel=2,
         )
-    return float((nrm2 - nrm1) / (nrm1 + nrm2))
+    if den < 1e-12:
+        warnings.warn(
+            "Directionality index denominator is too small; returning nan.",
+            RuntimeWarning,
+            stacklevel=2,
+        )
+        return float("nan")
+    return float((nrm2 - nrm1) / den)
 
 
 def co_cor_diff(Q1, Q2):
