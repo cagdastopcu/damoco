@@ -4,6 +4,8 @@
 
 This document summarizes the mathematical objects implemented in `domoco`, with notation aligned to the original DAMOCO toolbox.
 
+DAMOCO: Data Analysis with Models Of Coupled Oscillators
+
 Reference MATLAB toolbox:
 - http://www.stat.physik.uni-potsdam.de/%7Emros/damoco2.html
 

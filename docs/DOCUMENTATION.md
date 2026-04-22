@@ -4,6 +4,8 @@
 
 `domoco` is a Python implementation of the DAMOCO MATLAB toolbox functions for dynamical coupling analysis.
 
+DAMOCO: Data Analysis with Models Of Coupled Oscillators
+
 The project keeps the original `co_*` function names to make migration from MATLAB scripts straightforward.
 
 ## MATLAB Reference

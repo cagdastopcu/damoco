@@ -2,6 +2,8 @@
 
 `domoco` is a Python port of the DAMOCO MATLAB toolbox functions in this repository.
 
+DAMOCO: Data Analysis with Models Of Coupled Oscillators
+
 ## Reference MATLAB Toolbox
 
 - Official DAMOCO MATLAB page: http://www.stat.physik.uni-potsdam.de/%7Emros/damoco2.html

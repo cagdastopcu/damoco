@@ -4,6 +4,8 @@
 
 Establish parity between the original DAMOCO MATLAB implementation and this Python port for:
 
+DAMOCO: Data Analysis with Models Of Coupled Oscillators
+
 - API behavior (function names, defaults, outputs)
 - numerical equivalence (within floating-point tolerance)
 - expected qualitative behavior on synthetic systems
