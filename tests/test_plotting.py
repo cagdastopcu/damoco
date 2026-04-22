@@ -1,6 +1,6 @@
 import numpy as np
 
-from domoco import co_plot2coef, co_plot2cplf, co_plotcoef, co_plotcplf, co_plottri
+from damoco import co_plot2coef, co_plot2cplf, co_plotcoef, co_plotcplf, co_plottri
 
 
 def test_plotting_smoke():

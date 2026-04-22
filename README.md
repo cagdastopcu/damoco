@@ -1,6 +1,6 @@
-# domoco
+# damoco
 
-`domoco` is a Python port of the DAMOCO MATLAB toolbox functions in this repository.
+`damoco` is a Python port of the DAMOCO MATLAB toolbox functions in this repository.
 
 DAMOCO: Data Analysis with Models Of Coupled Oscillators
 
@@ -24,13 +24,13 @@ DAMOCO: Data Analysis with Models Of Coupled Oscillators
 Published package:
 
 ```bash
-pip install domoco
+pip install damoco
 ```
 
 Directly from GitHub:
 
 ```bash
-pip install git+https://github.com/cagdastopcu/domoco.git
+pip install git+https://github.com/cagdastopcu/damoco.git
 ```
 
 Local editable development install:

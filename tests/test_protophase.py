@@ -1,6 +1,6 @@
 import numpy as np
 
-from domoco import (
+from damoco import (
     co_avcyc,
     co_distproto,
     co_fbtrT,

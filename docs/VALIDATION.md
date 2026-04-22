@@ -43,7 +43,7 @@ For strict MATLAB-to-Python parity, use the same inputs in both environments:
 1. Generate test data in MATLAB and save (`.mat`) including:
    - input phases/time series
    - outputs from selected `co_*` functions
-2. Load same inputs in Python, run corresponding `domoco.co_*` calls.
+2. Load same inputs in Python, run corresponding `damoco.co_*` calls.
 3. Compare with metrics:
    - max absolute error (`L_inf`)
    - relative `L2` error
@@ -90,7 +90,7 @@ These usually produce small numeric differences that should not change qualitati
 
 For publication-quality reproducibility, include:
 
-- exact `domoco` version (PyPI tag or commit hash)
+- exact `damoco` version (PyPI tag or commit hash)
 - Python, NumPy, SciPy versions
 - MATLAB version/toolbox state
 - dataset/preprocessing details

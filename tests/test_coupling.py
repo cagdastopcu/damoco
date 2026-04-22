@@ -1,6 +1,6 @@
 import numpy as np
 
-from domoco import (
+from damoco import (
     co_fcplfct1,
     co_fcplfct2,
     co_fcpltri,

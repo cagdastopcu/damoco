@@ -2,7 +2,7 @@
 
 ## Scope
 
-This document summarizes the mathematical objects implemented in `domoco`, with notation aligned to the original DAMOCO toolbox.
+This document summarizes the mathematical objects implemented in `damoco`, with notation aligned to the original DAMOCO toolbox.
 
 DAMOCO: Data Analysis with Models Of Coupled Oscillators
 

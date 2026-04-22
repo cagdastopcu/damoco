@@ -1,4 +1,4 @@
-"""domoco: Python port of DAMOCO MATLAB functions.
+"""damoco: Python port of DAMOCO MATLAB functions.
 
 DAMOCO: Data Analysis with Models Of Coupled Oscillators
 

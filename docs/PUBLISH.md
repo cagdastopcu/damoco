@@ -1,14 +1,14 @@
-# Publishing `domoco` to PyPI
+# Publishing `damoco` to PyPI
 
 This repository is configured for publishing with GitHub Actions + PyPI Trusted Publisher (OIDC), so no PyPI API token is required in GitHub secrets.
 
 ## One-time Setup (PyPI)
 
 1. Create or log in to your PyPI account: https://pypi.org
-2. Create a new project entry name by publishing once manually or by first trusted publish (project name: `domoco`).
+2. Create a new project entry name by publishing once manually or by first trusted publish (project name: `damoco`).
 3. In PyPI project settings, configure **Trusted Publishers** with:
    - Owner: `cagdastopcu`
-   - Repository: `domoco`
+   - Repository: `damoco`
    - Workflow filename: `publish-pypi.yml`
    - Environment name: `pypi`
 
@@ -42,5 +42,5 @@ python -m twine check dist/*
 ## Install After Publish
 
 ```bash
-pip install domoco
+pip install damoco
 ```

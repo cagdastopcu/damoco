@@ -3,7 +3,7 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "domoco"
+name = "damoco"
 version = "0.1.2"
 description = "Python port of DAMOCO MATLAB functions."
 readme = "README.md"
@@ -36,9 +36,9 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/cagdastopcu/domoco"
-Repository = "https://github.com/cagdastopcu/domoco"
-Issues = "https://github.com/cagdastopcu/domoco/issues"
+Homepage = "https://github.com/cagdastopcu/damoco"
+Repository = "https://github.com/cagdastopcu/damoco"
+Issues = "https://github.com/cagdastopcu/damoco/issues"
 Source-MATLAB = "http://www.stat.physik.uni-potsdam.de/%7Emros/damoco2.html"
 
 [project.optional-dependencies]

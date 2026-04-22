@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.interpolate import RegularGridInterpolator
 
-from domoco import co_phidot1, co_phidot2, co_phidot3, co_prciter, co_resid_decomp
+from damoco import co_phidot1, co_phidot2, co_phidot3, co_prciter, co_resid_decomp
 
 
 def test_phidot_family():

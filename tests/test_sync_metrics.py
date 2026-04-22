@@ -1,6 +1,6 @@
 import numpy as np
 
-from domoco import (
+from damoco import (
     co_cor_diff,
     co_dirin,
     co_dirpar,

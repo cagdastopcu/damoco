@@ -1,8 +1,8 @@
-# domoco Documentation
+# damoco Documentation
 
 ## Overview
 
-`domoco` is a Python implementation of the DAMOCO MATLAB toolbox functions for dynamical coupling analysis.
+`damoco` is a Python implementation of the DAMOCO MATLAB toolbox functions for dynamical coupling analysis.
 
 DAMOCO: Data Analysis with Models Of Coupled Oscillators
 
@@ -30,12 +30,12 @@ pip install -e .[dev]
 
 ## Package Structure
 
-- `domoco.synchrony`: synchronization indices and max-scan utilities.
-- `domoco.metrics`: correlations, norms, and directionality measures.
-- `domoco.derivatives`: phase derivatives, residual decomposition, PRC iteration.
-- `domoco.coupling`: Fourier/kernel coupling function estimation and triad/network analysis.
-- `domoco.protophase`: protophase extraction and protophase-to-phase transforms.
-- `domoco.plotting`: plotting helpers compatible with the original workflow.
+- `damoco.synchrony`: synchronization indices and max-scan utilities.
+- `damoco.metrics`: correlations, norms, and directionality measures.
+- `damoco.derivatives`: phase derivatives, residual decomposition, PRC iteration.
+- `damoco.coupling`: Fourier/kernel coupling function estimation and triad/network analysis.
+- `damoco.protophase`: protophase extraction and protophase-to-phase transforms.
+- `damoco.plotting`: plotting helpers compatible with the original workflow.
 
 ## API (Public Functions)
 
