@@ -19,6 +19,20 @@
 
 ## Install
 
+Published package (after release to PyPI):
+
+```bash
+pip install domoco
+```
+
+Directly from GitHub:
+
+```bash
+pip install git+https://github.com/cagdastopcu/domoco.git
+```
+
+Local editable development install:
+
 ```bash
 pip install -e .[dev]
 ```
@@ -32,3 +46,4 @@ pytest -q
 ## Documentation
 
 - Full user/developer docs: [docs/DOCUMENTATION.md](docs/DOCUMENTATION.md)
+- PyPI release guide: [docs/PUBLISH.md](docs/PUBLISH.md)
